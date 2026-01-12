@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:WindowManager}",
+            "name": "Debug WindowManager",
+            "target": "WindowManager",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug WindowManager"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:WindowManager}",
+            "name": "Release WindowManager",
+            "target": "WindowManager",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release WindowManager"
+        }
+    ]
+}

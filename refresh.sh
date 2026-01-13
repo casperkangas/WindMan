@@ -43,8 +43,4 @@ EOF
 echo "✍️  Signing..."
 codesign --force --deep --sign - "$APP_NAME.app"
 
-echo "🚀 Launching $APP_NAME.app..."
-# open -a uses LaunchServices, so no terminal window will be attached
-open "$APP_NAME.app"
-
-echo "✅ Dev version updated and running."
+echo "✅ Dev version updated! You can now launch '$APP_NAME.app' from Finder."

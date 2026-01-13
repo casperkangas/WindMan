@@ -87,6 +87,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(
             NSMenuItem(title: "Show Guide", action: #selector(showGuide), keyEquivalent: "g"))
         menu.addItem(NSMenuItem.separator())
+
+        // Trademark
+        let creditItem = NSMenuItem(title: "© casperkangas 2026", action: nil, keyEquivalent: "")
+        creditItem.isEnabled = false  // Make it unclickable (greyed out)
+        menu.addItem(creditItem)
+
+        menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
         statusItem.menu = menu
     }

@@ -5,11 +5,12 @@ enum WindowSnapDirection {
     case left
     case right
     case maximize
+    case reset  // New reset case
 }
 
 struct WindowActions {
 
-    // MARK: - Snap / Maximize
+    // MARK: - Snap / Maximize / Reset
     static func snapActiveWindow(to direction: WindowSnapDirection) {
         guard let (windowElement, currentScreen) = getActiveWindowAndScreen() else { return }
 
@@ -19,23 +20,39 @@ struct WindowActions {
         // Calculate standard "Quartz" Y coordinate (flipping Cocoa's bottom-left origin)
         let standardY = primaryHeight - (visibleFrame.origin.y + visibleFrame.height)
 
-        // Fixed Warning: Changed 'var' to 'let' because these values are constant for our current logic
-        let newY: CGFloat = standardY
-        let newHeight: CGFloat = visibleFrame.height
-
+        // Prepare variables
         var newX: CGFloat = 0
+        var newY: CGFloat = standardY
         var newWidth: CGFloat = 0
+        var newHeight: CGFloat = visibleFrame.height  // Default to full height
 
         switch direction {
         case .maximize:
             newX = visibleFrame.origin.x
             newWidth = visibleFrame.width
+
         case .left:
             newX = visibleFrame.origin.x
             newWidth = visibleFrame.width / 2
+
         case .right:
             newX = visibleFrame.origin.x + (visibleFrame.width / 2)
             newWidth = visibleFrame.width / 2
+
+        case .reset:
+            // "Default" size: Approx 1/3 of screen area (using 1/1.75 scale factor)
+            // This centers the window.
+            let scaleFactor: CGFloat = 1.75
+            newWidth = visibleFrame.width / scaleFactor
+            newHeight = visibleFrame.height / scaleFactor
+
+            // Center X
+            newX = visibleFrame.origin.x + (visibleFrame.width - newWidth) / 2
+
+            // Center Y (Quartz coordinates)
+            // We add the top margin to standardY
+            let marginY = (visibleFrame.height - newHeight) / 2
+            newY = standardY + marginY
         }
 
         setWindowFrame(windowElement, x: newX, y: newY, width: newWidth, height: newHeight)
@@ -56,7 +73,6 @@ struct WindowActions {
         let nextScreen = screens[nextIndex]
 
         // Move to the center of the next screen (simple "Throw" logic)
-        // We calculate the top-left corner of the next screen in Quartz coordinates
         let visibleFrame = nextScreen.visibleFrame
         let primaryHeight = screens.first?.frame.height ?? 0
 
@@ -68,7 +84,6 @@ struct WindowActions {
         if let posVal = AXValueCreate(.cgPoint, &point) {
             AXUIElementSetAttributeValue(windowElement, kAXPositionAttribute as CFString, posVal)
 
-            // Fixed Error: Added availability check for localizedName (macOS 10.15+)
             if #available(macOS 10.15, *) {
                 print("Moved window to screen: \(nextScreen.localizedName)")
             } else {
@@ -79,7 +94,6 @@ struct WindowActions {
 
     // MARK: - Helpers
 
-    // Helper to apply size and position
     private static func setWindowFrame(
         _ window: AXUIElement, x: CGFloat, y: CGFloat, width: CGFloat, height: CGFloat
     ) {
@@ -94,7 +108,6 @@ struct WindowActions {
         }
     }
 
-    // Helper to find the window and the screen it is currently on
     private static func getActiveWindowAndScreen() -> (AXUIElement, NSScreen)? {
         guard let frontApp = NSWorkspace.shared.frontmostApplication else { return nil }
         let appElement = AXUIElementCreateApplication(frontApp.processIdentifier)
@@ -108,7 +121,6 @@ struct WindowActions {
 
         let windowElement = focusedWindow as! AXUIElement
 
-        // Find current position to determine screen
         var positionValue: AnyObject?
         AXUIElementCopyAttributeValue(
             windowElement, kAXPositionAttribute as CFString, &positionValue)
@@ -120,7 +132,6 @@ struct WindowActions {
 
         let primaryHeight = NSScreen.screens.first?.frame.height ?? 0
 
-        // Find which screen contains this point
         for screen in NSScreen.screens {
             let cocoaFrame = screen.frame
             let quartzY = primaryHeight - (cocoaFrame.origin.y + cocoaFrame.height)
@@ -133,7 +144,6 @@ struct WindowActions {
             }
         }
 
-        // Fallback to primary if not found
         return (windowElement, NSScreen.screens[0])
     }
 }

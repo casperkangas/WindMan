@@ -4,6 +4,7 @@ import Cocoa
 class KeyHandler {
 
     static func setupEventTap() -> CFMachPort? {
+        // Listen for KeyDown events
         let eventMask = (1 << CGEventType.keyDown.rawValue)
 
         return CGEvent.tapCreate(
@@ -35,6 +36,7 @@ func myCGEventCallback(
         let kLeftArrow = 123
         let kRightArrow = 124
         let kKeyL = 37
+        let kKeyR = 15  // 'R' Key
 
         // 1. Maximize: Cmd + Option + L
         if isCmd && isOption && !isCtrl && keyCode == kKeyL {
@@ -54,7 +56,13 @@ func myCGEventCallback(
             return nil
         }
 
-        // 4. Move Next Display: Ctrl + Option + Cmd + Right Arrow
+        // 4. Reset (Center 1/3): Cmd + Option + R
+        if isCmd && isOption && !isCtrl && keyCode == kKeyR {
+            WindowActions.snapActiveWindow(to: .reset)
+            return nil
+        }
+
+        // 5. Move Next Display: Ctrl + Option + Cmd + Right Arrow
         if isCmd && isOption && isCtrl && keyCode == kRightArrow {
             WindowActions.moveActiveWindowToNextScreen()
             return nil

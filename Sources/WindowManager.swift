@@ -2,7 +2,7 @@ import ApplicationServices
 import Cocoa
 
 @main
-struct WindowManager {
+struct WindMan {
     static func main() {
         let app = NSApplication.shared
         let delegate = AppDelegate()
@@ -47,7 +47,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // 6. Run as "Accessory" (Menu Bar Only, No Dock Icon)
         NSApp.setActivationPolicy(.accessory)
 
-        print("WindowManager Started. Look for 'WM' in the menu bar.")
+        print("WindMan started. Look for 'WM' in the menu bar.")
     }
 
     func checkPermissions() {
@@ -127,7 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             backing: .buffered,
             defer: false
         )
-        infoWindow.title = "WindowManager Guide"
+        infoWindow.title = "WindMan Guide"
         infoWindow.center()
         infoWindow.isReleasedWhenClosed = false
 
@@ -165,6 +165,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             Move to Next Screen
 
             ---
+
             Settings:
             Enable 'Snap Both Windows' in the menu bar to automatically snap the next visible window to the opposite side.
             """

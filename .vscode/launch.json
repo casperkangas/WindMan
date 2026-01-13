@@ -19,6 +19,26 @@
             "target": "WindowManager",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release WindowManager"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:WindowManager}",
+            "name": "Debug WindMan",
+            "target": "WindMan",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug WindMan"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:WindowManager}",
+            "name": "Release WindMan",
+            "target": "WindMan",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release WindMan"
         }
     ]
 }

@@ -3,20 +3,23 @@
 # Stop the script if any command fails
 set -e
 
-# 1. Kill the existing instance if it's running
-# We use '|| true' so the script doesn't crash if the app isn't currently running
-killall WindowManager 2>/dev/null || true
+APP_NAME="WindMan"
+
+# 1. Kill old instances
+# We filter to make sure we don't try to kill the system WindowManager
+echo "💀 Killing old instances..."
+pkill -9 -f ".build/debug/$APP_NAME" 2>/dev/null || true
 
 # 2. Build the project
-echo "🔨 Building WindowManager..."
+echo "🔨 Building $APP_NAME..."
 swift build
 
 # 3. Sign the binary (Ad-Hoc) to grant permissions
 echo "✍️  Signing binary..."
-codesign -s - --force .build/debug/WindowManager
+codesign -s - --force .build/debug/$APP_NAME
 
 # 4. Launch it in the background
 echo "🚀 Launching..."
-open .build/debug/WindowManager
+open .build/debug/$APP_NAME
 
 echo "✅ Done! App is running in the menu bar."

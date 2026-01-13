@@ -3,9 +3,9 @@
 # Stop the script immediately if any command fails
 set -e
 
-APP_NAME="WindowManager"
-EXECUTABLE_NAME="WindowManager"
-BUNDLE_ID="com.casperkangas.windowmanager"
+APP_NAME="WindMan"
+EXECUTABLE_NAME="WindMan"
+BUNDLE_ID="com.casperkangas.windman"
 VERSION="0.1.0"
 
 # 1. Clean previous builds
@@ -16,12 +16,9 @@ rm -rf "$APP_NAME.zip"
 
 # 2. Build Release version (Universal)
 echo "🚀 Building Release version (Optimized)..."
-# We run the build first
 swift build -c release --arch arm64 --arch x86_64
 
 # 3. Get the actual path of the binary
-# When building for multiple architectures, SPM changes the output folder.
-# We ask SPM where the binary is located.
 BIN_PATH=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
 echo "📍 Binary located at: $BIN_PATH"
 
@@ -31,7 +28,6 @@ mkdir -p "$APP_NAME.app/Contents/MacOS"
 mkdir -p "$APP_NAME.app/Contents/Resources"
 
 # 5. Copy the binary
-# We use the dynamic BIN_PATH we found earlier
 cp "$BIN_PATH/$EXECUTABLE_NAME" "$APP_NAME.app/Contents/MacOS/"
 
 # 6. Create Info.plist

@@ -1,5 +1,6 @@
 import ApplicationServices
 import Cocoa
+import Foundation
 
 @main
 struct WindMan {
@@ -20,6 +21,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     let kDualSnapKey = "DualSnapEnabled"
 
+    // --- UPDATE CONFIGURATION ---
+    let repoOwner = "casperkangas"  // Change if your GitHub username is different
+    let repoName = "WindMan"  // Change if your Repo name is different
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         checkPermissions()
 
@@ -35,8 +40,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupHotkeys()
         createInfoWindow()
 
-        // --- RESILIENCE LOGIC ---
-        // Listen for when the computer wakes up from sleep
+        // Listen for wake to refresh hotkeys
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
             selector: #selector(handleWake),
@@ -45,28 +49,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         )
 
         NSApp.setActivationPolicy(.accessory)
-        print("WindMan v1.0 active and sleep-aware.")
+        print("WindMan active.")
+
+        // Optional: Check for updates silently on launch
+        checkForUpdates(isUserInitiated: false)
     }
 
     @objc func handleWake() {
         print("🌅 Mac woke up. Refreshing hotkey tap...")
-        // Wait 1 second for the system to settle before re-enabling
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.setupHotkeys()
         }
     }
 
     func setupHotkeys() {
-        // Remove old source if it exists to prevent duplicates
         if let oldSource = runLoopSource {
             CFRunLoopRemoveSource(CFRunLoopGetCurrent(), oldSource, .commonModes)
         }
-
         guard let eventTap = KeyHandler.setupEventTap() else {
             print("❌ Failed to create event tap.")
             return
         }
-
         let source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
         self.runLoopSource = source
         CFRunLoopAddSource(CFRunLoopGetCurrent(), source, .commonModes)
@@ -86,6 +89,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func setupMenu() {
         let menu = NSMenu()
+
+        // Settings Submenu
         let settingsMenu = NSMenu()
         let dualSnapItem = NSMenuItem(
             title: "Snap Both Windows (Dual Snap)", action: #selector(toggleDualSnap(_:)),
@@ -95,19 +100,26 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         let settingsItem = NSMenuItem(title: "Settings", action: nil, keyEquivalent: "")
         settingsItem.submenu = settingsMenu
-
         menu.addItem(settingsItem)
+
         menu.addItem(NSMenuItem.separator())
+        menu.addItem(
+            NSMenuItem(
+                title: "Check for Updates...", action: #selector(checkForUpdatesMenuAction),
+                keyEquivalent: ""))
         menu.addItem(
             NSMenuItem(title: "Show Guide", action: #selector(showGuide), keyEquivalent: "g"))
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "© casperkangas 2026", action: nil, keyEquivalent: ""))
+
+        let creditItem = NSMenuItem(title: "© casperkangas 2026", action: nil, keyEquivalent: "")
+        creditItem.isEnabled = false
+        menu.addItem(creditItem)
+
         menu.addItem(NSMenuItem.separator())
 
-        // New Restart Option
         let restartItem = NSMenuItem(
             title: "Restart", action: #selector(restartApp), keyEquivalent: "r")
-        restartItem.keyEquivalentModifierMask = .command  // Cmd + R (only works when menu is open)
+        restartItem.keyEquivalentModifierMask = .command
         menu.addItem(restartItem)
 
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
@@ -125,29 +137,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.activate(ignoringOtherApps: true)
     }
 
-    // --- APP LIFECYCLE ---
-
     @objc func restartApp() {
-        // Determine valid path to relaunch
         let url = Bundle.main.bundleURL
         let path: String
-
         if url.pathExtension == "app" {
-            // Running as a packaged .app bundle
             path = url.path
         } else {
-            // Running as raw debug binary (bundleURL points to the folder, so use executablePath)
             path = Bundle.main.executablePath ?? url.path
         }
-
-        // -n forces a new instance, ensuring it re-opens correctly
         let script = "sleep 0.5; open -n '\(path)'"
-
         let task = Process()
         task.launchPath = "/bin/sh"
         task.arguments = ["-c", script]
         task.launch()
-
         NSApp.terminate(nil)
     }
 
@@ -167,7 +169,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let scrollView = NSScrollView(frame: infoWindow.contentView!.bounds)
         scrollView.hasVerticalScroller = true
         scrollView.autoresizingMask = [.width, .height]
-
         let content = NSTextView(frame: scrollView.bounds)
         content.string = """
             Active Hotkeys:
@@ -180,8 +181,88 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         content.isEditable = false
         content.font = NSFont.systemFont(ofSize: 14)
         content.textContainerInset = NSSize(width: 10, height: 10)
-
         scrollView.documentView = content
         infoWindow.contentView?.addSubview(scrollView)
     }
+
+    // --- UPDATE LOGIC ---
+
+    @objc func checkForUpdatesMenuAction() {
+        checkForUpdates(isUserInitiated: true)
+    }
+
+    func checkForUpdates(isUserInitiated: Bool) {
+        // 1. Get Current Version from Info.plist
+        let currentVer =
+            Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.0.0"
+
+        // 2. Prepare GitHub API URL
+        let urlString = "https://api.github.com/repos/\(repoOwner)/\(repoName)/releases/latest"
+        guard let url = URL(string: urlString) else { return }
+
+        print("Checking for updates... Current: \(currentVer)")
+
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data, error == nil else {
+                if isUserInitiated {
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "Check Failed"
+                        alert.informativeText = "Could not connect to GitHub."
+                        alert.runModal()
+                    }
+                }
+                return
+            }
+
+            do {
+                // 3. Parse JSON
+                let release = try JSONDecoder().decode(GitHubRelease.self, from: data)
+
+                // 4. Compare Versions
+                // Remove 'v' prefix if present (e.g. v1.0.1 -> 1.0.1)
+                let cleanTag = release.tag_name.replacingOccurrences(of: "v", with: "")
+
+                // Simple string comparison (works for 1.0.0 vs 1.0.1, but ideally use a semantic version comparator)
+                if cleanTag.compare(currentVer, options: .numeric) == .orderedDescending {
+
+                    // Update Available!
+                    DispatchQueue.main.async {
+                        let alert = NSAlert()
+                        alert.messageText = "New Version Available!"
+                        alert.informativeText =
+                            "WindMan \(release.tag_name) is out.\n\nCurrent: \(currentVer)\nNew: \(cleanTag)"
+                        alert.addButton(withTitle: "Download")
+                        alert.addButton(withTitle: "Cancel")
+
+                        let response = alert.runModal()
+                        if response == .alertFirstButtonReturn {
+                            if let link = URL(string: release.html_url) {
+                                NSWorkspace.shared.open(link)
+                            }
+                        }
+                    }
+                } else {
+                    // No Update
+                    if isUserInitiated {
+                        DispatchQueue.main.async {
+                            let alert = NSAlert()
+                            alert.messageText = "You're up to date!"
+                            alert.informativeText = "WindMan \(currentVer) is the latest version."
+                            alert.runModal()
+                        }
+                    }
+                }
+            } catch {
+                print("JSON Error: \(error)")
+            }
+        }
+        task.resume()
+    }
+}
+
+// Data model for GitHub API response
+struct GitHubRelease: Codable {
+    let tag_name: String
+    let html_url: String
 }

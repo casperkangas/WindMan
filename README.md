@@ -1,4 +1,4 @@
-🖥️ WindMan for macOS (v0.1)
+🖥️ WindMan for macOS
 -
 A lightweight, fast, and of course open-source **window manager** built purely in Swift. No bloat. No App Store fees. Just productivity.
 

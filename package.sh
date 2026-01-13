@@ -4,7 +4,7 @@ set -e
 APP_NAME="WindMan"
 EXECUTABLE_NAME="WindMan"
 BUNDLE_ID="com.casperkangas.windman"
-VERSION="1.0.0"
+VERSION="v1.0"
 
 echo "🧼 Cleaning previous builds..."
 rm -rf .build/release

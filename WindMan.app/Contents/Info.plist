@@ -8,6 +8,10 @@
     <string>com.casperkangas.windman</string>
     <key>CFBundleName</key>
     <string>WindMan</string>
+    <key>CFBundleShortVersionString</key>
+    <string>v1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>LSUIElement</key>

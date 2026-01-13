@@ -9,12 +9,16 @@
     <key>CFBundleName</key>
     <string>WindMan</string>
     <key>CFBundleShortVersionString</key>
-    <string>v1.0</string>
+    <string>v1.1</string>
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.15</string>
     <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>

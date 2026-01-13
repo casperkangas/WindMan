@@ -4,7 +4,7 @@ set -e
 APP_NAME="WindMan"
 EXECUTABLE_NAME="WindMan"
 BUNDLE_ID="com.casperkangas.windman"
-VERSION="v1.0"
+VERSION="v1.1"
 
 echo "🧼 Cleaning previous builds..."
 rm -rf .build/release
@@ -12,7 +12,7 @@ rm -rf "$APP_NAME.app"
 rm -rf "$APP_NAME.zip"
 rm -rf WindMan.iconset WindMan.icns
 
-echo "🚀 Building WindMan v1.0 Release..."
+echo "🚀 Building WindMan Version $VERSION Release..."
 swift build -c release --arch arm64 --arch x86_64
 
 BIN_PATH=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
@@ -76,7 +76,7 @@ EOF
 echo "✍️  Signing app bundle..."
 codesign --force --deep --sign - "$APP_NAME.app"
 
-echo "🤐 Zipping WindMan_v1.0.zip..."
-zip -r "WindMan_v1.0.zip" "$APP_NAME.app"
+echo "🤐 Zipping WindMan-$VERSION.zip..."
+zip -r "WindMan-$VERSION.zip" "$APP_NAME.app"
 
-echo "✅ Release ready: WindMan_v1.0.zip"
+echo "✅ Release ready: WindMan-$VERSION.zip"

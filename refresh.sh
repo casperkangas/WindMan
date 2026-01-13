@@ -4,7 +4,7 @@ set -e
 APP_NAME="WindMan"
 EXECUTABLE_NAME="WindMan"
 BUNDLE_ID="com.casperkangas.windman"
-VERSION="v1.0" # Matches your GitHub Release
+VERSION="v1.1" # Matches your GitHub Release
 
 echo "💀 Killing old instances..."
 killall -9 "$APP_NAME" 2>/dev/null || true

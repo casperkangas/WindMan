@@ -10,11 +10,13 @@ Welcome to **WindMan**, a native macOS utility designed to keep your workspace o
 
 **🔒 Privacy First:** Runs locally. No internet connection required. No data collection.
 
-**🛠️ Dual Snap:** Unique Feature! Automatically snap the window underneath your active window to the opposite side.
+**🔄 Built-in Updater:** Check for the latest GitHub releases directly from the menu bar.
+
+**🛠️ Dual Snap:** Automatically snap the window _underneath_ your active window to the opposite side.
 
 **🖥️ Multi-Monitor Support:** Throw windows instantly to your other displays.
 
-**🎨 Clean UI:** Lives quietly in your menu bar. Includes a built-in interactive guide.
+**🎨 Clean UI:** Lives quietly in your menu bar with a custom icon and interactive guide.
 
 
 ⌨️ Shortcuts / Hotkeys
@@ -34,33 +36,33 @@ Reset (Center 1/3)
 Move to Next Screen
 ```Ctrl + Opt + Cmd + →```
 
-_Tip: You can view these anytime by clicking the WM icon in the menu bar and selecting "Show Guide"._
+_Tip: You can view these anytime by clicking the **WM** icon in the menu bar and selecting "Show Guide"._
 
 
 📥 Installation
 -
 **Option 1: The Easy Way (User)**
 
-1. Go to the Releases page.
+1. Go to the [Releases]([url](https://github.com/casperkangas/WindMan/releases)) page.
 
-2. Download WindowManager.zip.
+2. Download ```WindMan-v1.1.zip.```
 
-3. Unzip and drag WindowManager.app to your Applications folder.
+3. Unzip and drag ```WindMan.app``` to your **Applications** folder.
 
 4. Double-click to run.
 
-5. Permissions: You will be prompted to grant Accessibility permissions. This is required for the app to move windows.
+5. **Permissions:** You will be prompted to grant **Accessibility** permissions. This is required for the app to move windows.
 
-**Option 2: The Developer Way (Build from Source)**
+**Option 2: The Developer Way**
 
 1. Clone this repo.
 
 2. Open in VS Code or Terminal.
 
-3. Run the build script:
-```./build.sh```
+3. Run the local dev script (build and runs):
+```./refresh.sh```
 
-4. To create a distributable .app bundle run the package script:
+4. To create a distributable ```.app``` bundle run the package script:
 ```./package.sh```
 
 ⚠️ Troubleshooting Permissions
@@ -69,13 +71,13 @@ If the app is running but hotkeys aren't working, macOS likely has "stale" permi
 
 **The Fix:**
 
-1. Go to System Settings > Privacy & Security > Accessibility.
+1. Go to **System Settings** > **Privacy & Security** > **Accessibility**.
 
-2. Find WindMan in the list.
+2. Find **WindMan** in the list.
 
-3. DO NOT just toggle the switch. Click the Minus (-) button to delete it completely.
+3. **DO NOT** just toggle the switch. Click the **Minus (-)** button to delete it completely.
 
-4. Restart the app.
+4. Restart the app (or use the new **Restart** option in the menu).
 
 5. When prompted, grant permission again.
 
@@ -91,6 +93,6 @@ If the app is running but hotkeys aren't working, macOS likely has "stale" permi
 
 ©️ Credits
 -
-Created by _casperkangas_ (2026)
+Created by **casperkangas** (2026)
 
-Open Source / MIT License
+_Open Source / MIT License_

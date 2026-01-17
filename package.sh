@@ -4,7 +4,13 @@ set -e
 APP_NAME="WindMan"
 EXECUTABLE_NAME="WindMan"
 BUNDLE_ID="com.casperkangas.windman"
-VERSION="v1.2"
+
+# ---------------------------------------------------------
+# ⚠️ UPDATE THIS VERSION NUMBER BEFORE EVERY RELEASE!
+# This determines what version the app thinks it is.
+# Match this to your GitHub Release tag WITHOUT THE "V" (e.g. v1.2 -> 1.3)
+VERSION="1.3"
+# ---------------------------------------------------------
 
 echo "🧼 Cleaning previous builds..."
 rm -rf .build/release
